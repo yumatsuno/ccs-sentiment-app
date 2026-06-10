@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(cp .env.example .env)",
+      "Bash(python -m uvicorn app.main:app --port 8000)",
+      "Bash(curl -s http://127.0.0.1:8000/)",
+      "Bash(kill %1)",
+      "Bash(curl -s -o resp.html -w \"%{http_code}\\\\n\" http://127.0.0.1:8000/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8000/)",
+      "Bash(python -m uvicorn app.main:app --port 8010)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8010/)",
+      "Bash(python -c \"import jinja2, fastapi, starlette; print\\(jinja2.__version__, fastapi.__version__, starlette.__version__\\)\")",
+      "Bash(python -m uvicorn app.main:app --port 8011)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8011/)",
+      "Bash(sed -n '955,970p' \"C:\\\\Users\\\\yumat\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\Lib\\\\site-packages\\\\jinja2\\\\environment.py\")",
+      "Bash(sed -n '100,150p' \"C:\\\\Users\\\\yumat\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\Lib\\\\site-packages\\\\starlette\\\\templating.py\")",
+      "Bash(python -m uvicorn app.main:app --port 8012)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8012/)",
+      "PowerShell(netsh interface ipv4 show excludedportrange protocol=tcp)"
+    ]
+  }
+}
