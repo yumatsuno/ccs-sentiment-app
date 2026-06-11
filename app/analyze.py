@@ -27,26 +27,28 @@ SYSTEM_PROMPT = (
 
 def analyze_pending():
     if not ANTHROPIC_API_KEY:
-        raise RuntimeError("ANTHROPIC_API_KEY is not set in .env")
+        raise RuntimeError("ANTHROPIC_API_KEY is not set")
 
     client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
     init_db()
     session = SessionLocal()
     analyzed = 0
+    errors = []
     try:
         posts = session.query(Post).filter(Post.sentiment_score.is_(None)).all()
         for post in posts:
-            message = client.messages.create(
-                model=MODEL,
-                max_tokens=50,
-                system=SYSTEM_PROMPT,
-                messages=[{"role": "user", "content": post.text}],
-            )
-            content = message.content[0].text.strip()
             try:
+                message = client.messages.create(
+                    model=MODEL,
+                    max_tokens=50,
+                    system=SYSTEM_PROMPT,
+                    messages=[{"role": "user", "content": post.text}],
+                )
+                content = message.content[0].text.strip()
                 score = int(json.loads(content)["score"])
-            except (json.JSONDecodeError, KeyError, ValueError, TypeError):
+            except Exception as e:
+                errors.append(f"{post.id}: {e}")
                 continue
 
             score = max(1, min(5, score))
@@ -57,9 +59,16 @@ def analyze_pending():
     finally:
         session.close()
 
-    return analyzed
+    if errors:
+        print(f"分析エラー ({len(errors)}件):")
+        for err in errors[:5]:
+            print(f"  - {err}")
+
+    return analyzed, errors
 
 
 if __name__ == "__main__":
-    n = analyze_pending()
-    print(f"分析完了: {n}件")
+    n, errs = analyze_pending()
+    print(f"分析完了: {n}件 / エラー: {len(errs)}件")
+    for e in errs:
+        print(f"  - {e}")

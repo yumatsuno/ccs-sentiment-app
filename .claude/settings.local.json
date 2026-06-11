@@ -17,7 +17,10 @@
       "Bash(sed -n '100,150p' \"C:\\\\Users\\\\yumat\\\\AppData\\\\Local\\\\Python\\\\pythoncore-3.14-64\\\\Lib\\\\site-packages\\\\starlette\\\\templating.py\")",
       "Bash(python -m uvicorn app.main:app --port 8012)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://127.0.0.1:8012/)",
-      "PowerShell(netsh interface ipv4 show excludedportrange protocol=tcp)"
+      "PowerShell(netsh interface ipv4 show excludedportrange protocol=tcp)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)"
     ]
   }
 }

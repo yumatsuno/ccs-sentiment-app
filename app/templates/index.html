@@ -44,6 +44,10 @@
     </form>
   </div>
 
+  {% if message %}
+  <p style="background:#fff3cd; padding:0.5rem; border:1px solid #ffeeba;">{{ message }}</p>
+  {% endif %}
+
   <p>件数: {{ posts|length }}</p>
 
   <table>

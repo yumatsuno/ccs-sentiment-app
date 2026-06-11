@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Query, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from urllib.parse import quote
 import os
 
 from .config import SEARCH_QUERY
@@ -17,7 +18,7 @@ init_db()
 
 
 @app.get("/", response_class=HTMLResponse)
-def index(request: Request, label: str = Query(default="")):
+def index(request: Request, label: str = Query(default=""), message: str = Query(default="")):
     session = SessionLocal()
     try:
         query = session.query(Post).order_by(Post.posted_at.desc())
@@ -36,17 +37,22 @@ def index(request: Request, label: str = Query(default="")):
             "labels": labels,
             "selected_label": label,
             "search_query": SEARCH_QUERY,
+            "message": message,
         },
     )
 
 
 @app.post("/fetch")
 def trigger_fetch(search_query: str = Form(default=SEARCH_QUERY), max_results: int = Form(default=100)):
-    fetch_posts(max_results=max_results, query=search_query)
-    return RedirectResponse(url="/", status_code=303)
+    saved, total = fetch_posts(max_results=max_results, query=search_query)
+    msg = f"{total}件取得（新規{saved}件）"
+    return RedirectResponse(url=f"/?message={quote(msg)}", status_code=303)
 
 
 @app.post("/analyze")
 def trigger_analyze():
-    analyze_pending()
-    return RedirectResponse(url="/", status_code=303)
+    n, errors = analyze_pending()
+    msg = f"{n}件を分析"
+    if errors:
+        msg += f"（エラー{len(errors)}件: {errors[0]}）"
+    return RedirectResponse(url=f"/?message={quote(msg)}", status_code=303)
