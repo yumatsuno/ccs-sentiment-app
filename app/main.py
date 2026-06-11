@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request, Query
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, Query, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 import os
 
+from .config import SEARCH_QUERY
 from .models import SessionLocal, Post, init_db
 from .fetch_x import fetch_posts
 from .analyze import analyze_pending
@@ -30,17 +31,22 @@ def index(request: Request, label: str = Query(default="")):
     return templates.TemplateResponse(
         request,
         "index.html",
-        {"posts": posts, "labels": labels, "selected_label": label},
+        {
+            "posts": posts,
+            "labels": labels,
+            "selected_label": label,
+            "search_query": SEARCH_QUERY,
+        },
     )
 
 
 @app.post("/fetch")
-def trigger_fetch(max_results: int = 100):
-    saved, total = fetch_posts(max_results=max_results)
-    return {"fetched": total, "saved": saved}
+def trigger_fetch(search_query: str = Form(default=SEARCH_QUERY), max_results: int = Form(default=100)):
+    fetch_posts(max_results=max_results, query=search_query)
+    return RedirectResponse(url="/", status_code=303)
 
 
 @app.post("/analyze")
 def trigger_analyze():
-    n = analyze_pending()
-    return {"analyzed": n}
+    analyze_pending()
+    return RedirectResponse(url="/", status_code=303)

@@ -10,13 +10,13 @@ from .models import SessionLocal, Post, init_db
 SEARCH_URL = "https://api.twitter.com/2/tweets/search/recent"
 
 
-def fetch_posts(max_results: int = 100):
+def fetch_posts(max_results: int = 100, query: str = None):
     if not X_BEARER_TOKEN:
         raise RuntimeError("X_BEARER_TOKEN is not set in .env")
 
     headers = {"Authorization": f"Bearer {X_BEARER_TOKEN}"}
     params = {
-        "query": SEARCH_QUERY,
+        "query": query or SEARCH_QUERY,
         "max_results": max(10, min(max_results, 100)),
         "tweet.fields": "created_at,author_id",
         "expansions": "author_id",

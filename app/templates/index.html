@@ -33,6 +33,9 @@
     </form>
 
     <form method="post" action="/fetch" onsubmit="return confirm('X APIから新規ポストを取得します。よろしいですか?');">
+      <label>検索キーワード:
+        <input type="text" name="search_query" value="{{ search_query }}" size="50">
+      </label>
       <button type="submit">新規取得</button>
     </form>
 
