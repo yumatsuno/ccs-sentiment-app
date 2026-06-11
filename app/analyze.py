@@ -1,5 +1,6 @@
 """DBに保存済みで未分析のポストに対し、Claude APIで5段階感情判定を行う。"""
 import json
+import re
 import datetime
 
 import anthropic
@@ -46,7 +47,15 @@ def analyze_pending():
                     messages=[{"role": "user", "content": post.text}],
                 )
                 content = message.content[0].text.strip()
-                score = int(json.loads(content)["score"])
+                try:
+                    score = int(json.loads(content)["score"])
+                except (json.JSONDecodeError, KeyError, TypeError):
+                    match = re.search(r'"score"\s*:\s*(\d)', content)
+                    if not match:
+                        match = re.search(r"[1-5]", content)
+                    if not match:
+                        raise ValueError(f"応答からスコアを抽出できません: {content!r}")
+                    score = int(match.group(0)[-1])
             except Exception as e:
                 errors.append(f"{post.id}: {e}")
                 continue
